@@ -2,46 +2,58 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Snake Game</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>Snake</title>
   <style>
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      background: #1a1a2e;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      font-family: monospace;
+      color: #eee;
+      touch-action: none;
     }
 
     body {
-      background: #1a1a2e;
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
-      height: 100vh;
-      font-family: monospace;
-      color: #eee;
+      justify-content: flex-start;
+      padding-top: env(safe-area-inset-top, 16px);
+      padding-bottom: env(safe-area-inset-bottom, 0px);
+      height: 100dvh;
     }
 
     h1 {
-      font-size: 2rem;
-      margin-bottom: 16px;
+      font-size: 1.4rem;
       color: #4ecca3;
       letter-spacing: 4px;
+      margin: 10px 0 6px;
     }
 
     #score-board {
       display: flex;
-      gap: 40px;
-      margin-bottom: 12px;
-      font-size: 1rem;
+      gap: 32px;
+      margin-bottom: 8px;
+      font-size: 0.9rem;
     }
 
-    #score-board span {
-      color: #aaa;
-    }
+    #score-board span { color: #aaa; }
+    #score-board strong { color: #4ecca3; }
 
-    #score-board strong {
-      color: #4ecca3;
+    #canvas-wrap {
+      position: relative;
+      flex-shrink: 0;
     }
 
     canvas {
@@ -52,30 +64,25 @@
 
     #overlay {
       position: absolute;
+      inset: 0;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 12px;
+      gap: 10px;
+      background: rgba(22, 33, 62, 0.85);
     }
 
-    #overlay h2 {
-      font-size: 1.8rem;
-      color: #e94560;
-    }
-
-    #overlay p {
-      color: #aaa;
-      font-size: 0.95rem;
-    }
+    #overlay h2 { font-size: 1.6rem; color: #e94560; }
+    #overlay p  { color: #aaa; font-size: 0.9rem; }
 
     button {
-      margin-top: 8px;
-      padding: 10px 28px;
+      margin-top: 6px;
+      padding: 12px 32px;
       background: #4ecca3;
       color: #1a1a2e;
       border: none;
-      border-radius: 4px;
+      border-radius: 6px;
       font-family: monospace;
       font-size: 1rem;
       font-weight: bold;
@@ -83,15 +90,46 @@
       letter-spacing: 1px;
     }
 
-    button:hover {
-      background: #38b48e;
+    /* ── D-pad ── */
+    #dpad {
+      display: grid;
+      grid-template-columns: repeat(3, 64px);
+      grid-template-rows: repeat(3, 64px);
+      gap: 4px;
+      margin-top: 16px;
     }
 
-    #controls {
-      margin-top: 14px;
-      font-size: 0.8rem;
-      color: #555;
+    .dpad-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(78, 204, 163, 0.15);
+      border: 2px solid rgba(78, 204, 163, 0.4);
+      border-radius: 10px;
+      font-size: 1.6rem;
+      cursor: pointer;
+      user-select: none;
+      -webkit-user-select: none;
+      color: #4ecca3;
+      transition: background 0.1s;
     }
+
+    .dpad-btn:active {
+      background: rgba(78, 204, 163, 0.35);
+    }
+
+    .dpad-btn.empty {
+      border: none;
+      background: none;
+      pointer-events: none;
+    }
+
+    /* grid positions */
+    #btn-up    { grid-column: 2; grid-row: 1; }
+    #btn-left  { grid-column: 1; grid-row: 2; }
+    #btn-pause { grid-column: 2; grid-row: 2; font-size: 1rem; }
+    #btn-right { grid-column: 3; grid-row: 2; }
+    #btn-down  { grid-column: 2; grid-row: 3; }
   </style>
 </head>
 <body>
@@ -102,16 +140,22 @@
     <span>BEST: <strong id="best">0</strong></span>
   </div>
 
-  <div style="position: relative;">
-    <canvas id="canvas" width="400" height="400"></canvas>
+  <div id="canvas-wrap">
+    <canvas id="canvas"></canvas>
     <div id="overlay">
       <h2 id="overlay-title">SNAKE</h2>
-      <p id="overlay-msg">Use arrow keys or WASD to move</p>
+      <p id="overlay-msg">Swipe or use the D-pad</p>
       <button id="start-btn">START</button>
     </div>
   </div>
 
-  <div id="controls">Arrow Keys / WASD to move &nbsp;|&nbsp; P to pause</div>
+  <div id="dpad">
+    <div class="dpad-btn" id="btn-up">▲</div>
+    <div class="dpad-btn" id="btn-left">◀</div>
+    <div class="dpad-btn" id="btn-pause">⏸</div>
+    <div class="dpad-btn" id="btn-right">▶</div>
+    <div class="dpad-btn" id="btn-down">▼</div>
+  </div>
 
   <script src="game.js"></script>
 </body>
